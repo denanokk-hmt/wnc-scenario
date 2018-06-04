@@ -1,0 +1,13 @@
+
+
+#Watson credential
+/config/watson.json
+
+#node_modules
+/node_modules/
+
+#Backupfiles
+*.bk
+
+#Logfiles
+/logs-wnc/

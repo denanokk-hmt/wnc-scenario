@@ -1,0 +1,10 @@
+#
+.git
+.gitignore
+*.bk
+docker-compose.yml*
+.vscode
+Dockerfile*
+InitialSetting.READ
+README.md
+*.bk
