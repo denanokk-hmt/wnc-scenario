@@ -1,0 +1,29 @@
+{
+  "name": "watson-node-connection",
+  "version": "2.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node --max-old-space-size=700 ./bin/www"
+  },
+  "dependencies": {
+    "body-parser": "~1.18.2",
+    "cookie-parser": "~1.4.3",
+    "dateformat": "^3.0.3",
+    "dotenv": "^4.0.0",
+    "express": "^4.16.3",
+    "express-session": "^1.15.6",
+    "file-stream-rotator": "^0.2.1",
+    "jade": "^1.11.0",
+    "mocha": "^5.2.0",
+    "morgan": "~1.9.0",
+    "pm2": "^2.10.2",
+    "promise-timeout": "^1.1.1",
+    "serve-favicon": "~2.4.5",
+    "uglify-js": "^3.3.25",
+    "watson-developer-cloud": "^3.4.2"
+  },
+  "repository": {},
+  "engines": {
+    "node": "8.x"
+  }
+}

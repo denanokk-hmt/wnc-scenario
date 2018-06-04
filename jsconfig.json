@@ -1,0 +1,6 @@
+{
+    "compilerOptions": {
+        "target": "es8",
+        "module": "commonjs"
+    }
+}
