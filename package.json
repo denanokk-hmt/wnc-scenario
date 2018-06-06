@@ -6,6 +6,7 @@
     "start": "node --max-old-space-size=700 ./bin/www"
   },
   "dependencies": {
+    "bluebird": "^3.5.1",
     "body-parser": "~1.18.2",
     "cookie-parser": "~1.4.3",
     "dateformat": "^3.0.3",
@@ -18,6 +19,7 @@
     "morgan": "~1.9.0",
     "pm2": "^2.10.2",
     "promise-timeout": "^1.1.1",
+    "redis": "^2.8.0",
     "serve-favicon": "~2.4.5",
     "uglify-js": "^3.3.25",
     "watson-developer-cloud": "^3.4.2"

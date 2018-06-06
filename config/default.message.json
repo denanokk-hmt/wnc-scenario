@@ -1,6 +1,6 @@
 {
-	"min_length_error" : "大変申し訳ございません。わからないのでちょっと待って欲しいであります。。\n「注文履歴を」「確認したい」などのように長文ではなく目的を簡単に入力いただくか、最後にお送りする、リンクよりお問い合わせお願いいたします。\n店舗に関するお問い合わせは、お近くの店舗にて直接お問い合わせお願いします。\n\nファッション相談をご希望の際は、「スタイリストに相談」とだけ入力お願いいたします。営業時間内(平日10:00-23:00土日、祝12:00-23:00)に順次ご案内させていただきます。\nhttps://www.urban-research.jp/contact/index.php",
-    "timeout_error" : "大変申し訳ございません。ただいま、たくさんのお客様にご利用いただいております。ご案内にお時間かかってしまいます。\n\nお手数ですが、少しお時間経あけていただき、再度メッセージお送りお願いいたします。",
-    "watson_converation_api_error" : "申し訳ありません、、\nただいま、混み合っており、ご案内ができないであります。\n時間を置いてご連絡をいただくか、店舗に関するお問い合わせは、お近くの店舗にて直接お問い合わせお願いします。\nhttps://www.urban-research.jp/contact/index.php",
-	"confidence_error" : "大変申し訳ございません。私の理解不足でご案内することできません。\nお手数ですが、再度メッセージをご入力いただくか。カスタマーサポートまでご連絡お願いいたします。"
+	"min_length_error" : "min_length_error",
+    "timeout_error" : "timeout_error",
+    "watson_converation_api_error" : "watson_converation_api_error",
+	"confidence_error" : "confidence_error"
 }

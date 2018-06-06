@@ -142,7 +142,7 @@ var errorLog = function (str, stdoutFlag, writingFlag, date) {
 		var date = dateformat(new Date(), 'yyyymmdd-HH:MM:ss:l');
 	}
 	//Message
-	var msg = '[ERROR]' + date + '|' + str;
+	var msg = '[ERROR]' + date + '|' + JSON.stringify(str, null, '\t');
 	//Logging
 	if (stdoutFlag == true) {
 		console.error(msg);

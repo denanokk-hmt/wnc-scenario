@@ -51,7 +51,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 //Using routers middlewares
 app.use('/', index);
 app.use('/samples', samples);
-app.use('/v1/searchers/alias/' + env.searcher_id + '/search-answer', conversation);
+//app.use('/v1/searchers/alias/' + env.searcher_id + '/search-answer', conversation);
+app.use('/scenario/' + env.searcher_id, conversation);
 app.use('/qa_curl_test', qa_curl_test);
 
 // catch 404 and forward to error handler
