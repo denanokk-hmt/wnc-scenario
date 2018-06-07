@@ -1,24 +1,5 @@
 'use strict';
 
-//var kvs = require('../modules/redis.js');
-/*
-//Redis Server
-const REDIS_HOST = 'localhost';
-const REDIS_PORT = '6379';
-var redis = require('redis');
-var redis_client = redis.createClient(REDIS_PORT, REDIS_HOST);
-
-//Redis connect checking
-redis_client.on("error", function(err) {
-  console.log(err);
-});
-
-redis_client.set('start', 'starting redis');
-redis_client.get('start', function(err, data){
-  console.log(data);
-});
-*/
-
 //Basic
 var express = require('express');
 var router = express.Router();
@@ -32,6 +13,9 @@ var conf = require('../config/config.json');
 var default_msg = require('../config/default.message.json');
 var valid = require('../modules/validation.js');
 
+//Redis Server
+var kvs = require('../modules/redis.js');
+
 //Instance watson conversation
 var ConversationV1 = require('watson-developer-cloud/conversation/v1');
 var conversation = new ConversationV1({
@@ -40,10 +24,22 @@ var conversation = new ConversationV1({
   version_date : '2018-05-23'
 });
 
+/*
 //Routing from /conversation?serach={user input word}
 router.get('/', function(req, res, next) {
   //Request to Watson Conversation API & Respons  
   watosnConversationAPI(req, res);
+});
+*/
+
+//Routing from /conversation?serach={user input word}
+router.post('/', function(req, res, next) {
+
+  //res.header('Content-Type', 'application/json; charset=utf-8');
+  res.send('ok-sky!!');
+
+  //Request to Watson Conversation API & Respons  
+  watosnConversationAPI(req);
 });
 
 //Get response context
@@ -58,17 +54,17 @@ function getResContext(room_id) {
 }
 
 //Watson Conversation Q & A
-function watosnConversationAPI(req, res) {
-
-  //var res_context;
-  var room_id = 'room:' + '1';
+function watosnConversationAPI(req) {
 
   //Logging Data
   var logID = '[' + Math.floor(Math.random()*Math.floor(100000)) + ']';
   var logDate = logID + dateformat(new Date(), 'yyyymmdd-HH:MM:ss:l');
   var localFlag = (req.headers.host.split(":")[0] == 'localhost' || '127.0.0.1')? true : false; 
   var req_url = decodeURIComponent(req.baseUrl);
-  var quest = req.query.text.replace(/\r?\n/g,"");
+  
+  //Get post data
+  var room_id = 'room:' + req.body.room_id;
+  var quest = req.body.quest.replace(/\r?\n/g,"");
 
   //Get Answer from Watson conversation
   var watsonAnswer = function(question, res_context) {
@@ -201,8 +197,9 @@ function watosnConversationAPI(req, res) {
 
   //Response sendding
   var resResult = function(result) {
-    res.header('Content-Type', 'application/json; charset=utf-8')
-    res.send(answerFormat2Json(result));
+    //res.header('Content-Type', 'application/json; charset=utf-8');
+    //res.send(answerFormat2Json(result));
+    console.log(result);
   };
 
   //Needs minimus quest length & care of exclusion strings.

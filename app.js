@@ -15,11 +15,13 @@ var logger = require('./modules/log.js');
 //require('dotenv').config();
 var env = require('./config/env.json');
 
-//Require of router middlewares
+//Require of router middlewares for GET request
 var index = require('./routes/index');
 var samples = require('./routes/samples');
 var conversation = require('./routes/conversation');
 var qa_curl_test = require('./routes/test/conversation4test');
+//Require of router middlewares for POST request
+var cv2 = require('./routes/cv2');
 
 //Imstance express FW
 var app = express();
@@ -48,12 +50,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Use JSESSIONID as cookie and in memory session store
 //app.use(expressSession({ key: 'JSESSIONID', secret: 'whatever', store: sessionStore})); 
 
-//Using routers middlewares
+//Using routers middlewares for GET request
 app.use('/', index);
 app.use('/samples', samples);
 //app.use('/v1/searchers/alias/' + env.searcher_id + '/search-answer', conversation);
-app.use('/scenario/' + env.searcher_id, conversation);
+app.use('/scenario_test/' + env.searcher_id, conversation);
 app.use('/qa_curl_test', qa_curl_test);
+
+//Using routers middlewares for POST request
+app.use('/scenario/' + env.searcher_id, cv2);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
