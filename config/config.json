@@ -1,6 +1,6 @@
 {
     "confidence_exclusion": 0.3,
-    "watson_timeout": 5000,
+    "timeout": 5000,
     "question_min_length": 4,
     "under_min_length" : {
     	"conversation_id" : "not enough question length",

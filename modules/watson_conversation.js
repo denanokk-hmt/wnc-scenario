@@ -48,77 +48,76 @@ function watosnConversationAPI(req) {
   //Get Answer from Watson conversation
   var watsonAnswer = function(question, res_context) {
 
-  //Convert to Object
-  if (!res_context[0]) {
-    //case exist room_id = res_context is null
-    res_context = {"conversation":""};
-  } else {
-    res_context = JSON.parse(res_context || "null");
-  }
+    //Convert to Object
+    if (!res_context[0]) {
+      //case exist room_id = res_context is null
+      res_context = {"conversation":""};
+    } else {
+      res_context = JSON.parse(res_context || "null");
+    }
     
     //call watson conversation with Promise
     return new Promise(function(resolve, reject) {
-        conversation.message(
-          { 
-            workspace_id : watson.WORKSPACE_ID,
-            input: { text: question},
-            context: res_context 
-          },
-          //getting response 
-          function(err, response) {
-            //Return error
-            if (err) {
-              reject(err);
-              return;
-            }
-            //Set this quest's context into redis hash
-            res_context = JSON.stringify(response.context);
-            kvs.redis_client.hset(room_id, "res_context", res_context);
-
-            //Intents & Entities, Confidense setting
-            if (!Object.keys(response.intents).length && !Object.keys(response.entities).length) {
-              //intents & entities are both nothing.
-              var intents = 'not understatnd';
-              var entities = 'not understatnd';
-              var confidence = [ 0, 0 ];
-            } else if (Object.keys(response.intents).length && !Object.keys(response.entities).length) {
-              //intents is, but entities is nothing.
-              var intents = response.intents[0].intent;
-              var entities = 'nothing';
-              var confidence = [ response.intents[0].confidence, 0 ];
-            } else if (!Object.keys(response.intents).length && Object.keys(response.entities).length) {
-              //intents is nothing, but entities is.
-              var intents = 'nothing';
-              var entities = response.entities[0].entity;
-              var confidence = [ 0, response.entities[0].confidence ];
-            } else {
-              var intents = response.intents[0].intent;
-              var entities = response.entities[0].entity;
-              var confidence = [ response.intents[0].confidence, response.entities[0].confidence];
-            }
-
-            //Answer text
-            var response_text = '';
-            for (var i = 0, len = response.output.text.length; i < len; i++) {
-              response_text += '\\n' + response.output.text[i];
-            }
-            response_text = response_text.substr(2);
-
-            //Return success message with OK-SKY responce format
-            resolve(
-              {
-                conversation_id : response.context.conversation_id,
-                intents : intents,
-                entities : entities,
-                confidence : confidence,
-                text : response_text,
-                nodes_visited : response.output.nodes_visited[0]
-              }
-            );
+      conversation.message(
+        { 
+          workspace_id : watson.WORKSPACE_ID,
+          input: { text: question},
+          context: res_context 
+        },
+        //getting response 
+        function(err, response) {
+          //Return error
+          if (err) {
+            reject(err);
+            return;
           }
-          );
-      });
+          //Set this quest's context into redis hash
+          res_context = JSON.stringify(response.context);
+          kvs.redis_client.hset(room_id, "res_context", res_context);
 
+          //Intents & Entities, Confidense setting
+          if (!Object.keys(response.intents).length && !Object.keys(response.entities).length) {
+            //intents & entities are both nothing.
+            var intents = 'not understatnd';
+            var entities = 'not understatnd';
+            var confidence = [ 0, 0 ];
+          } else if (Object.keys(response.intents).length && !Object.keys(response.entities).length) {
+            //intents is, but entities is nothing.
+            var intents = response.intents[0].intent;
+            var entities = 'nothing';
+            var confidence = [ response.intents[0].confidence, 0 ];
+          } else if (!Object.keys(response.intents).length && Object.keys(response.entities).length) {
+            //intents is nothing, but entities is.
+            var intents = 'nothing';
+            var entities = response.entities[0].entity;
+            var confidence = [ 0, response.entities[0].confidence ];
+          } else {
+            var intents = response.intents[0].intent;
+            var entities = response.entities[0].entity;
+            var confidence = [ response.intents[0].confidence, response.entities[0].confidence];
+          }
+
+          //Answer text
+          var response_text = '';
+          for (var i = 0, len = response.output.text.length; i < len; i++) {
+            response_text += '\\n' + response.output.text[i];
+          }
+          response_text = response_text.substr(2);
+
+          //Return success message with OK-SKY responce format
+          resolve(
+            {
+              conversation_id : response.context.conversation_id,
+              intents : intents,
+              entities : entities,
+              confidence : confidence,
+              text : response_text,
+              nodes_visited : response.output.nodes_visited[0]
+            }
+          );
+        }
+      );
+    });
   };
 
   //Answer Formatting to JSON
@@ -136,7 +135,7 @@ function watosnConversationAPI(req) {
       result.confidence = [ 0, 0 ];
     } else if (result.error) {
       //Watson Converation API Error
-      result.text = default_msg.watson_converation_api_error;
+      result.text = default_msg.converation_api_error;
       result.intents = 'Watson Assistant error';
       result.entities = 'Watson Assistant error';
       result.confidence = [ 0, 0 ];
@@ -179,9 +178,16 @@ function watosnConversationAPI(req) {
 
   //Response sendding
   var resResult = function(result) {
+
+    //
+    // 出力方法未実装
+    //
+
     //res.header('Content-Type', 'application/json; charset=utf-8');
     //res.send(answerFormat2Json(result));
     console.log(result);
+    
+    //curl
   };
 
   //Needs minimus quest length & care of exclusion strings.
@@ -193,11 +199,11 @@ function watosnConversationAPI(req) {
           return getResContext(room_id);
     }
 
-    //
+    //Call function(resContext ==> watsonAnswer ==> resResult)
     Promise.all([resContext(room_id)]).then((context) => {    
       
       //Call Watson Answer & response send(Timeout 10second)
-      pt.timeout(watsonAnswer(quest, context), conf.watson_timeout)
+      pt.timeout(watsonAnswer(quest, context), conf.timeout)
       .then(function(answer) {
         resResult(answer);
       }).catch(function(error) {
