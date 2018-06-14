@@ -168,7 +168,7 @@ function watosnConversationAPI(req) {
           intents: result.intents,
           entities: result.entities,
           cos_similarity: 0.8,
-          confidence: result.confidence,
+          confidence: result.confidence[0],
           answer_altered: true,
           question: null
         }
@@ -183,11 +183,14 @@ function watosnConversationAPI(req) {
     // 出力方法未実装
     //
 
+    //Response from GET Request
     //res.header('Content-Type', 'application/json; charset=utf-8');
     //res.send(answerFormat2Json(result));
-    console.log(result);
+
+    console.log(result.confidence);
+    console.log(answerFormat2Json(result));
     
-    //curl
+    //curl???
   };
 
   //Needs minimus quest length & care of exclusion strings.
@@ -196,7 +199,7 @@ function watosnConversationAPI(req) {
     
     //Get befor one response context of watson answer from redis hash 
     var resContext = function(room_id) {
-          return getResContext(room_id);
+      return getResContext(room_id);
     }
 
     //Call function(resContext ==> watsonAnswer ==> resResult)
@@ -223,4 +226,4 @@ function watosnConversationAPI(req) {
 
 }
 
-module.exports.watosnConversationAPI = watosnConversationAPI;
+module.exports.conversationAPI = watosnConversationAPI;

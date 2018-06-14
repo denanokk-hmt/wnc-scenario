@@ -1,24 +1,5 @@
 'use strict';
 
-//var kvs = require('../modules/redis.js');
-/*
-//Redis Server
-const REDIS_HOST = 'localhost';
-const REDIS_PORT = '6379';
-var redis = require('redis');
-var redis_client = redis.createClient(REDIS_PORT, REDIS_HOST);
-
-//Redis connect checking
-redis_client.on("error", function(err) {
-  console.log(err);
-});
-
-redis_client.set('start', 'starting redis');
-redis_client.get('start', function(err, data){
-  console.log(data);
-});
-*/
-
 //Basic
 var express = require('express');
 var router = express.Router();
