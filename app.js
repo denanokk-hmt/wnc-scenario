@@ -1,6 +1,6 @@
 'use strict';
 
-//Require modukle of basement
+//Require module of basement
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -18,8 +18,9 @@ var env = require('./config/env.json');
 //Require of router middlewares for GET request
 var index = require('./routes/index');
 var samples = require('./routes/samples');
-var conversation = require('./routes/conversation');
-var qa_curl_test = require('./routes/test/conversation4test');
+var conversation = require('./routes/cv1');
+var curl_test = require('./routes/curl_test');
+
 //Require of router middlewares for POST request
 var cv2 = require('./routes/cv2');
 
@@ -51,11 +52,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 //app.use(expressSession({ key: 'JSESSIONID', secret: 'whatever', store: sessionStore})); 
 
 //Using routers middlewares for GET request
+console.log("SET searcher_id is " + env.searcher_id);
 app.use('/', index);
 app.use('/samples', samples);
-//app.use('/v1/searchers/alias/' + env.searcher_id + '/search-answer', conversation);
-app.use('/scenario_test/' + env.searcher_id, conversation);
-app.use('/qa_curl_test', qa_curl_test);
+app.use('/v1/searchers/alias/' + env.searcher_id + '/search-answer', conversation);
+app.use('/cv1/curl_test', curl_test);
 
 //Using routers middlewares for POST request
 app.use('/scenario/' + env.searcher_id, cv2);

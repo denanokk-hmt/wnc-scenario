@@ -3,54 +3,50 @@
 var express = require('express');
 var router = express.Router();
 var pt = require('promise-timeout');
+var logger = require('../modules/log.js');
+var dateformat = require('dateformat');
 
-//System variables
-var env = require('../../config/watson.json');
-var conf = require('../../config/config.json');
-var default_msg = require('../../config/default.message.json');
-var valid = require('../../modules/validation.js');
+//Configures 
+var conf = require('../config/config.json');
+var default_msg = require('../config/default.message.json');
+var valid = require('../modules/validation.js');
 
+//Watson
+var watson = require('../config/watson.json');
 
 //Instance watson conversation
 var ConversationV1 = require('watson-developer-cloud/conversation/v1');
 var conversation = new ConversationV1({
-  username : env.CONVERSATION_USERNAME,
-  password : env.CONVERSATION_PASSWORD,
-  path : { workspace_id : env.WORKSPACE_ID },
-  version_date : '2018-04-01'
+  username : watson.CONVERSATION_USERNAME,
+  password : watson.CONVERSATION_PASSWORD,
+  version_date : '2018-05-23'
 });
 
 //Roting from /conversation?serach={user input word}
 router.get('/', function(req, res, next) {
-
   //Request to Watson Conversation API & Respons  
-  watosnConversationAPI(req, res); 
+  watosnConversationAPI(req, res);
 });
 
 //Watson Conversation Q & A
 function watosnConversationAPI(req, res) {
 
-  //User Question
-  var req_url = decodeURIComponent(req.url);
-  var search = req.query.text.replace(/\r?\n/g,"");
-  //console.log(req);
-  console.log(search);
-
-  /*
-  //Sentence func testing
-  var sentence = require('../modules/sentence.js');
-  sentence.func(search);
-  */
+  //Logging Data
+  var logID = '[' + Math.floor(Math.random()*Math.floor(100000)) + ']';
+  var logDate = logID + dateformat(new Date(), 'yyyymmdd-HH:MM:ss:l');
+  var localFlag = (req.headers.host.split(":")[0] == 'localhost' || '127.0.0.1')? true : false; 
+  var req_url = decodeURIComponent(req.baseUrl);
+  var quest = req.query.text.replace(/\r?\n/g,"");
 
   //Get Answer from Watson conversation
   var watsonAnswer = function(question) {
 
       //call watson conversation with Promise
       return new Promise(function(resolve, reject) {
-        conversation.message({ input: { text: question} }, function(err, response) {
-
-          //Return error
-          if (err) {  
+        conversation.message({ 
+          workspace_id : watson.WORKSPACE_ID,
+          input: { text: question} }, function(err, response) {
+          if (err) {
             reject(err);
             return;
           }
@@ -77,7 +73,7 @@ function watosnConversationAPI(req, res) {
             var confidence = [ response.intents[0].confidence, response.entities[0].confidence];
           }
 
-          //Return messages wiht success
+          //Return success message with OK-SKY responce format
           resolve(
             {
               conversation_id : response.context.conversation_id,
@@ -108,8 +104,8 @@ function watosnConversationAPI(req, res) {
     } else if (result.error) {
       //Watson Converation API Error
       result.text = default_msg.watson_converation_api_error;
-      result.intents = 'Watson conversation error';
-      result.entities = 'Watson conversation error';
+      result.intents = 'Watson Assistant error';
+      result.entities = 'Watson Assistant error';
       result.confidence = [ 0, 0 ];
     } else if (result.confidence < conf.confidence_exclusion) {
       //Confidence Error
@@ -118,19 +114,34 @@ function watosnConversationAPI(req, res) {
       result.entities = 'Not enough Confidene(<' + conf.confidence_exclusion + ')'; 
     }
 
-    //result log to STDOUT
-    console.log(result); 
+    //Case Silence Answer
+    var result_text = (result.text)? result.text.replace(/\r?\n/g,"") : "";
 
-    //
-    if (result.text) {
-      var answer = result.text.replace(/\r?\n/g,"");
-      answer = answer.replace(/,/g,"");
-    } else {
-      var answer = '';
-    }
-    //Retrun results
-    //質問文、Intents、Intent Confidence、Entities、Entity Confidence、回答文
-    return search + ',' + result.intents + ',' + result.confidence[0]  + ',' + result.entities + ',' + result.confidence[1] + ',' + answer;
+    //Logging 
+    //logger.systemJSON(result, localFlag, true, logDate);    
+    var logOutStr = 'quest:' + quest + 
+                    '|' + 'answer:' + result_text + 
+                    '|' + 'intents:' + result.intents + 
+                    '|' + 'entities:' + result.entities;
+    logger.system(logOutStr, localFlag, true, logDate);
+
+    //Retrun formatting JSON answers
+    return {
+      searcher_id: result.conversation_id,
+      url: req_url,
+      text: quest,
+      answer_list: [
+        {
+          answer: result_text,
+          intents: result.intents,
+          entities: result.entities,
+          cos_similarity: 0.8,
+          confidence: result.confidence,
+          answer_altered: true,
+          question: null
+        }
+      ]
+    };
   };
 
   //Response sendding
@@ -139,16 +150,21 @@ function watosnConversationAPI(req, res) {
     res.send(answerFormat2Json(result));
   };
 
-  //Needs minimus search length & care of exclusion strings.
-  if (valid.func(search)) {
+  //Needs minimus quest length & care of exclusion strings.
+  if (valid.func(quest)) {
+    process.on('unhandledRejection', console.dir);
 
     //Call Watson Answer & response send(Timeout 10second)
-    pt.timeout(watsonAnswer(search), conf.watson_timeout)
+    pt.timeout(watsonAnswer(quest), conf.ai_timeout)
     .then(function(answer) {
       resResult(answer);
     }).catch(function(error) {
-      console.error(error); //erorr log to STDERR 
-      resResult(error);
+      //console.error(error); //erorr log to STDERR 
+      logger.error(error, localFlag, true, logDate);
+      //set default error result
+      var result = [];
+      result.error = error;
+      resResult(result);
     });
 
   } else {

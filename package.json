@@ -8,6 +8,7 @@
   "dependencies": {
     "bluebird": "^3.5.1",
     "body-parser": "~1.18.2",
+    "config": "^1.30.0",
     "cookie-parser": "~1.4.3",
     "dateformat": "^3.0.3",
     "dotenv": "^4.0.0",
@@ -22,7 +23,8 @@
     "redis": "^2.8.0",
     "serve-favicon": "~2.4.5",
     "uglify-js": "^3.3.25",
-    "watson-developer-cloud": "^3.4.2"
+    "watson-developer-cloud": "^3.4.2",
+    "yaml": "^0.3.0"
   },
   "repository": {},
   "engines": {

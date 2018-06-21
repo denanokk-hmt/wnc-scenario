@@ -23,14 +23,13 @@ var conversation = new ConversationV1({
 
  //Get response context
 function getResContext(room_id) {
-    //Get context before quest's from redis hash.
-    return new Promise((resolve, reject) => {
-      kvs.redis_client.hget(room_id, 'res_context', function(err, val) {
-        if (err) reject(err);
-        resolve(val);
-      });
+  return new Promise((resolve, reject) => {
+    kvs.redis_client.hget(room_id, 'res_context', function(err, val) {
+      if (err) reject(err);
+      resolve(val);
     });
-  }
+  });
+}
   
 //Watson Conversation Q & A
 function watosnConversationAPI(req) {
