@@ -22,7 +22,11 @@ var conversation = require('./routes/cv1');
 var curl_test = require('./routes/curl_test');
 
 //Require of router middlewares for POST request
-var cv2 = require('./routes/cv2');
+if (env.redis_use) {
+  var cv2 = require('./routes/cv2');
+} else {
+  console.log("this mode is no redis. means do not use scenario."); 
+}
 
 //Imstance express FW
 var app = express();
@@ -59,7 +63,9 @@ app.use('/v1/searchers/alias/' + env.searcher_id + '/search-answer', conversatio
 app.use('/cv1/curl_test', curl_test);
 
 //Using routers middlewares for POST request
-app.use('/scenario/' + env.searcher_id, cv2);
+if (env.redis_use) {
+  app.use('/scenario/' + env.searcher_id, cv2);
+}
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
